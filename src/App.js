@@ -1,25 +1,34 @@
-import logo from './logo.svg';
+import React, {useState} from "react";
 import './App.css';
+import SearchUser from './components/SearchUser';
+import RepoList from './components/RepoList';
+import { fetchRepos } from "./Services/github";
 
-function App() {
-  return (
+function App(){
+  const [repos, setRepos] = useState([]);
+  const [error, setError] = useState('');
+
+  const handleSearch = async (username)=>{
+    try{
+      const data = await fetchRepos(username);
+      setRepos(data);
+      setError('');
+    }
+    catch(err){
+      setError(err.message);
+      setRepos([]);
+    }
+  };
+
+  return(
     <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          Edit <code>src/App.js</code> and save to reload.
-        </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React
-        </a>
-      </header>
+       <header className= "App-header">
+        <h1>Github Repositories Viewers</h1> 
+        <SearchUser onSearch={handleSearch}/>
+        {error && <p>{error}</p>}
+        <RepoList repos= {repos}/>
+       </header>
     </div>
   );
 }
-
-export default App;
+ export default App;
